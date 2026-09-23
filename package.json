@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "dev": "npm --prefix character-ai run dev"
+  },
   "dependencies": {
     "@rive-app/react-canvas": "^4.34.3"
   }
