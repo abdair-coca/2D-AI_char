@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 import decideHandler from './api/decide.js'
+import createShapeHandler from './api/create-shape.js'
 
 async function readRequestBody(request: IncomingMessage) {
   const chunks: Buffer[] = []
@@ -51,6 +52,50 @@ function decideApiPlugin(): Plugin {
   }
 }
 
+function createShapeApiPlugin(): Plugin {
+  return {
+    name: 'dev-create-shape-api',
+    configureServer(server) {
+      server.middlewares.use('/api/create-shape', async (request, response, next) => {
+        try {
+          let body: unknown
+
+          try {
+            body = JSON.parse(await readRequestBody(request))
+          } catch {
+            body = undefined
+          }
+
+          let responded = false
+          const apiResponse = {
+            status(statusCode: number) {
+              response.statusCode = statusCode
+              return apiResponse
+            },
+            json(value: unknown) {
+              response.setHeader('Content-Type', 'application/json')
+              response.end(JSON.stringify(value))
+              responded = true
+              return apiResponse
+            },
+          }
+
+          await createShapeHandler({
+            method: request.method,
+            body,
+          }, apiResponse)
+
+          if (!responded && !response.writableEnded) {
+            next()
+          }
+        } catch (error) {
+          next(error)
+        }
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -60,6 +105,6 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react(), decideApiPlugin()],
+    plugins: [react(), decideApiPlugin(), createShapeApiPlugin()],
   }
 })

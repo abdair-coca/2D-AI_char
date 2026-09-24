@@ -1,9 +1,10 @@
+import type {
+  CharacterState,
+} from "../character/useCharacterController";
+
 export type JevDecision =
-  | "base"
-  | "ghost"
-  | "flower"
-  | "create_new"
-  | "none";
+  | CharacterState
+  | "create_new";
 
 type DecideResponse = {
   decision: JevDecision;

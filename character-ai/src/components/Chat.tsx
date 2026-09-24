@@ -77,7 +77,7 @@ export default function Chat({
 
     // Personaje pensando
     await characterRef.current?.play(
-      "Cloud"
+      "think"
     );
 
     // Simulamos latencia del futuro LLM
@@ -109,30 +109,15 @@ export default function Chat({
         reply.message.length * 45
       )
     );
-
     const steps: {
       state: CharacterState;
       duration: number;
     }[] = [];
 
-    if (decision === "ghost") {
+    if (decision !== "create_new") {
       steps.push({
-        state: "Ghost",
+        state: decision,
         duration: 1200,
-      });
-    }
-
-    else if (decision === "flower") {
-      steps.push({
-        state: "Flower",
-        duration: 1200,
-      });
-    }
-
-    else if (decision === "base") {
-      steps.push({
-        state: "Base",
-        duration: 800,
       });
     }
 

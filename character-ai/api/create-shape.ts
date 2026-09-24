@@ -10,6 +10,14 @@ type GeneratedGeometry = {
     points: Point[];
 };
 
+type GroqResponse = {
+    choices?: Array<{
+        message?: {
+            content?: unknown;
+        };
+    }>;
+};
+
 function isValidGeometry(
     value: unknown
 ): value is GeneratedGeometry {
@@ -218,12 +226,16 @@ RULES:
             });
         }
 
-        const data = await llmResponse.json();
+        const data =
+            await llmResponse.json() as GroqResponse;
 
         const content =
             data.choices?.[0]?.message?.content;
 
-        if (!content) {
+        if (
+            typeof content !== "string" ||
+            !content
+        ) {
             return response.status(502).json({
                 error: "Model returned no geometry",
             });
