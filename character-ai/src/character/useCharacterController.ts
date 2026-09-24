@@ -1,25 +1,13 @@
 import { useCallback, useRef } from "react";
 
-export const CHARACTER_STATES = [
-  "Base",
-  "Hello",
-  "Ghost",
-  "Flower",
-  "Talk",
-  "Cloud",
-  "MorphTest",
-  "S-Triangle",
-  "S-Square",
-  "Think",
-  "Yes",
-  "No",
-  "TalkA",
-  "TalkB",
-  "TalkC",
-  "TalkBC",
-] as const;
+export {
+  CHARACTER_STATES,
+  type CharacterState,
+} from "./characterStates";
 
-export type CharacterState = (typeof CHARACTER_STATES)[number];
+import type {
+  CharacterState,
+} from "./characterStates";
 
 type SetState = ((value: string) => void) | undefined;
 type Trigger = (() => void) | undefined;
