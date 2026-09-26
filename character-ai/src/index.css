@@ -39,19 +39,22 @@
 }
 
 html {
+  height: 100%;
   min-width: 320px;
-  min-height: 100%;
   background: var(--ink-950);
+  overflow: hidden;
 }
 
 body {
+  height: 100%;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100svh;
   margin: 0;
   background:
     radial-gradient(circle at 12% 12%, rgba(118, 92, 255, 0.22), transparent 27rem),
     radial-gradient(circle at 86% 82%, rgba(255, 120, 152, 0.12), transparent 25rem),
     var(--ink-950);
+  overflow: hidden;
 }
 
 button,
@@ -72,7 +75,9 @@ input:focus-visible {
 
 #root {
   width: 100%;
-  min-height: 100svh;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 h1,
