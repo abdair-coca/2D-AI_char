@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import Character from "./components/Character";
 import Chat from "./components/Chat";
+import "./App.css";
 
 import type {
   CharacterController,
