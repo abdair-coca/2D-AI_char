@@ -1,18 +1,12 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Character from "./components/Character";
 import Chat from "./components/Chat";
-import type {
-  ShapeSpec,
-} from "./types/shape";
 
 import type {
   CharacterController,
 } from "./character/useCharacterController";
 
 export default function App() {
-  const [dynamicShape, setDynamicShape] =
-    useState<ShapeSpec | null>(null);
-
   const characterRef =
     useRef<CharacterController | null>(
       null
@@ -34,12 +28,10 @@ export default function App() {
     >
       <Character
         ref={characterRef}
-        dynamicShape={dynamicShape}
       />
 
       <Chat
         characterRef={characterRef}
-        onShapeCreated={setDynamicShape}
       />
     </main>
   );

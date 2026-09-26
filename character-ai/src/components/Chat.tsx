@@ -17,10 +17,6 @@ import {
   decideJevAction,
 } from "../ia/decideJevAction";
 
-import type {
-  ShapeSpec,
-} from "../types/shape";
-
 import {
   createShape,
 } from "../ia/createShape";
@@ -33,9 +29,6 @@ type Message = {
 type Props = {
   characterRef:
   RefObject<CharacterController | null>;
-
-  onShapeCreated:
-  (shape: ShapeSpec | null) => void;
 };
 
 const wait = (ms: number) =>
@@ -45,7 +38,6 @@ const wait = (ms: number) =>
 
 export default function Chat({
   characterRef,
-  onShapeCreated,
 }: Props) {
   const [input, setInput] = useState("");
   const [messages, setMessages] =
@@ -75,85 +67,77 @@ export default function Chat({
       },
     ]);
 
-    // Personaje pensando
-    await characterRef.current?.play(
-      "think"
-    );
+    try {
+      // Personaje pensando mientras se resuelven las decisiones.
+      await characterRef.current?.play("think");
 
-    // Simulamos latencia del futuro LLM
-    await wait(1500);
+      // Simulamos latencia del futuro LLM.
+      await wait(1500);
 
-    const decision =
-      await decideJevAction(text);
+      const decision =
+        await decideJevAction(text);
 
-    console.log(
-      "JEV decision:",
-      decision
-    );
+      const reply = getMockReply(text);
 
-    const reply = getMockReply(text);
+      setMessages((current) => [
+        ...current,
+        {
+          role: "character",
+          content: reply.message,
+        },
+      ]);
 
-    // Mostramos respuesta
-    setMessages((current) => [
-      ...current,
-      {
-        role: "character",
-        content: reply.message,
-      },
-    ]);
-
-    const talkDuration = Math.max(
-      1200,
-      Math.min(
-        3500,
-        reply.message.length * 45
-      )
-    );
-    const steps: {
-      state: CharacterState;
-      duration: number;
-    }[] = [];
-
-    if (decision !== "create_new") {
-      steps.push({
-        state: decision,
-        duration: 1200,
-      });
-    }
-
-    else if (decision === "create_new") {
-      console.log(
-        "JEV está creando una nueva forma..."
+      const talkDuration = Math.max(
+        1200,
+        Math.min(
+          3500,
+          reply.message.length * 45
+        )
       );
+      const steps: {
+        state: CharacterState;
+        duration: number;
+      }[] = [];
 
-      const newShape =
-        await createShape(text);
+      if (decision === "create_new") {
+        const parameters =
+          await createShape(text);
 
-      console.log(
-        "Nueva forma:",
-        newShape
-      );
+        await characterRef.current?.applyShapeParameters(
+          parameters
+        );
+      } else {
+        steps.push({
+          state: decision,
+          duration: 1200,
+        });
+      }
 
-      onShapeCreated(newShape);
-    }
+      if (reply.reaction && decision === "create_new") {
+        steps.push({
+          state: reply.reaction,
+          duration: 900,
+        });
+      }
 
-    else if (reply.reaction) {
       steps.push({
-        state: reply.reaction,
-        duration: 900,
+        state: "Talk",
+        duration: talkDuration,
       });
+
+      await characterRef.current?.sequence(steps);
+    } catch (error) {
+      console.error("JEV interaction failed:", error);
+      setMessages((current) => [
+        ...current,
+        {
+          role: "character",
+          content: "No pude completar esa interacción.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
     }
-
-    steps.push({
-      state: "Talk",
-      duration: talkDuration,
-    });
-
-    await characterRef.current?.sequence(
-      steps
-    );
-
-    setLoading(false);
   };
 
   return (

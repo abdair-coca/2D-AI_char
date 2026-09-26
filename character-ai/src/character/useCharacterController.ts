@@ -9,6 +9,10 @@ import type {
   CharacterState,
 } from "./characterStates";
 
+import type {
+  ShapeParameters,
+} from "../types/shape";
+
 type SetState = ((value: string) => void) | undefined;
 type Trigger = (() => void) | undefined;
 
@@ -115,4 +119,8 @@ export function useCharacterController(
   };
 }
 export type CharacterController =
-  ReturnType<typeof useCharacterController>;
+  ReturnType<typeof useCharacterController> & {
+    applyShapeParameters: (
+      parameters: ShapeParameters
+    ) => Promise<void>;
+  };
