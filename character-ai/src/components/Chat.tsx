@@ -21,6 +21,12 @@ import {
   createShape,
 } from "../ia/createShape";
 
+import {
+  ChatBubbleIcon,
+  PaperclipIcon,
+  SendIcon,
+} from "./UiIcons";
+
 type Message = {
   role: "user" | "character";
   content: string;
@@ -144,82 +150,60 @@ export default function Chat({
 
   return (
     <div className={className}>
-      <div
-        style={{
-          minHeight: 180,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          marginBottom: 20,
-        }}
-      >
-        {messages.map(
-          (message, index) => (
-            <div
-              key={index}
-              style={{
-                alignSelf:
-                  message.role === "user"
-                    ? "flex-end"
-                    : "flex-start",
-
-                padding: "10px 14px",
-                borderRadius: 16,
-
-                background:
-                  message.role === "user"
-                    ? "#222"
-                    : "#eee",
-
-                color:
-                  message.role === "user"
-                    ? "white"
-                    : "#222",
-              }}
-            >
-              {message.content}
-            </div>
-          )
+      <div className="chat-log" aria-live="polite">
+        {messages.length === 0 && !loading && (
+          <div className="chat-empty-state">
+            <span className="chat-empty-icon">
+              <ChatBubbleIcon size={64} />
+            </span>
+            <h3>Habla con JEV</h3>
+            <p>Escribe algo y deja que JEV encuentre una respuesta propia.</p>
+          </div>
         )}
 
-        {loading && (
+        {messages.map((message, index) => (
           <div
-            style={{
-              opacity: 0.5,
-            }}
+            className={`chat-message chat-message--${message.role}`}
+            key={`${message.role}-${index}`}
           >
-            Pensando...
+            {message.content}
+          </div>
+        ))}
+
+        {loading && (
+          <div className="chat-status">
+            <span className="typing-dots" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+            JEV está pensando...
           </div>
         )}
       </div>
 
-      <form
-        onSubmit={sendMessage}
-        style={{
-          display: "flex",
-          gap: 10,
-        }}
-      >
+      <form className="chat-composer" onSubmit={sendMessage}>
+        <span className="composer-leading-icon" aria-hidden="true">
+          <PaperclipIcon size={23} />
+        </span>
         <input
+          aria-label="Mensaje para JEV"
+          className="chat-input"
           value={input}
           onChange={(event) =>
             setInput(event.target.value)
           }
           placeholder="Dile algo..."
           disabled={loading}
-          style={{
-            flex: 1,
-            padding: "12px 16px",
-            borderRadius: 12,
-            border: "1px solid #ccc",
-          }}
         />
 
         <button
+          aria-label="Enviar mensaje"
+          className="send-button"
           type="submit"
           disabled={loading}
         >
-          Enviar
+          <SendIcon size={24} />
         </button>
       </form>
     </div>

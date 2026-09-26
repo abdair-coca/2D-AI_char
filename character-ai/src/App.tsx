@@ -1,6 +1,11 @@
 import { useRef } from "react";
 import Character from "./components/Character";
 import Chat from "./components/Chat";
+import {
+  GearIcon,
+  SparkleIcon,
+  TrashIcon,
+} from "./components/UiIcons";
 import "./App.css";
 
 import type {
@@ -42,11 +47,6 @@ export default function App() {
                 Háblale. Observa cómo piensa, responde y cambia de forma.
               </p>
             </div>
-
-            <span className="live-pill">
-              <span className="status-dot" aria-hidden="true" />
-              Activo
-            </span>
           </div>
 
           <div className="character-stage">
@@ -56,11 +56,23 @@ export default function App() {
 
         <section className="conversation-panel" aria-labelledby="conversation-title">
           <header className="conversation-panel__header">
-            <p className="eyebrow">Conversación</p>
-            <h2 id="conversation-title">Habla con JEV</h2>
-            <p className="panel-description">
-              Escribe algo y deja que JEV encuentre una respuesta propia.
-            </p>
+            <div className="conversation-panel__title-row">
+              <h2 className="eyebrow" id="conversation-title">
+                Conversación
+              </h2>
+
+              <div className="conversation-tools" aria-hidden="true">
+                <span className="conversation-tool">
+                  <TrashIcon size={18} />
+                </span>
+                <span className="conversation-tool">
+                  <SparkleIcon size={18} />
+                </span>
+                <span className="conversation-tool">
+                  <GearIcon size={18} />
+                </span>
+              </div>
+            </div>
           </header>
 
           <Chat

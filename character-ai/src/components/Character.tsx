@@ -21,12 +21,13 @@ import {
   Layout,
   Fit,
   Alignment,
-} from "@rive-app/react-webgl2";
+} from "@rive-app/react-canvas";
 
 import {
   useCharacterController,
   type CharacterController,
 } from "../character/useCharacterController";
+import TransparentRiveCanvas from "./TransparentRiveCanvas";
 
 type Props = object;
 
@@ -42,11 +43,12 @@ const Character =
       _props,
       ref
     ) {
-      const { rive, RiveComponent } = useRive({
+      const { rive, canvas, RiveComponent } = useRive({
         src: "/rive/prove1.riv",
         stateMachines: STATE_MACHINE,
         autoplay: true,
         autoBind: false,
+        useOffscreenRenderer: false,
         shouldDisableRiveListeners: false,
 
         layout: new Layout({
@@ -248,7 +250,8 @@ const Character =
           className="character-orbit"
           aria-label="JEV, personaje animado interactivo"
         >
-          <RiveComponent />
+          <RiveComponent className="rive-source" />
+          <TransparentRiveCanvas sourceCanvas={canvas} />
 
           <div
             className="character-controls-preview"
@@ -265,9 +268,10 @@ const Character =
               gap: 6,
             }}
           >
-            <label>
-              Width: {shapeParameters.shapeWidth}
+            <label className="shape-control-row">
+              <span>Width</span>
               <input
+                aria-label="Width"
                 type="range"
                 min="50"
                 max="150"
@@ -279,11 +283,13 @@ const Character =
                   )
                 }
               />
+              <output>{shapeParameters.shapeWidth}</output>
             </label>
 
-            <label>
-              Height: {shapeParameters.shapeHeight}
+            <label className="shape-control-row">
+              <span>Height</span>
               <input
+                aria-label="Height"
                 type="range"
                 min="50"
                 max="150"
@@ -295,11 +301,13 @@ const Character =
                   )
                 }
               />
+              <output>{shapeParameters.shapeHeight}</output>
             </label>
 
-            <label>
-              Sharpness: {shapeParameters.shapeSharpness}
+            <label className="shape-control-row">
+              <span>Sharpness</span>
               <input
+                aria-label="Sharpness"
                 type="range"
                 min="0"
                 max="100"
@@ -311,6 +319,7 @@ const Character =
                   )
                 }
               />
+              <output>{shapeParameters.shapeSharpness}</output>
             </label>
           </div>
         </div>
