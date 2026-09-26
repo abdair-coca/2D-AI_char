@@ -245,19 +245,13 @@ const Character =
 
       return (
         <div
-          style={{
-            width: "500px",
-            height: "500px",
-            position: "relative",
-
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          className="character-orbit"
+          aria-label="JEV, personaje animado interactivo"
         >
           <RiveComponent />
 
           <div
+            className="character-controls-preview"
             style={{
               position: "absolute",
               left: 12,

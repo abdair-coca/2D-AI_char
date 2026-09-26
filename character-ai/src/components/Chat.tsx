@@ -29,6 +29,7 @@ type Message = {
 type Props = {
   characterRef:
   RefObject<CharacterController | null>;
+  className?: string;
 };
 
 const wait = (ms: number) =>
@@ -38,6 +39,7 @@ const wait = (ms: number) =>
 
 export default function Chat({
   characterRef,
+  className,
 }: Props) {
   const [input, setInput] = useState("");
   const [messages, setMessages] =
@@ -141,12 +143,7 @@ export default function Chat({
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: 500,
-      }}
-    >
+    <div className={className}>
       <div
         style={{
           minHeight: 180,
