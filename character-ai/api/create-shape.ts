@@ -1,14 +1,9 @@
 import { readFileSync } from "node:fs";
 
-type Point = {
-    x: number;
-    y: number;
-};
-
-type GeneratedGeometry = {
-    name: string;
-    points: Point[];
-};
+import {
+    isShapeParameters,
+    type ShapeParameters,
+} from "../src/types/shape.js";
 
 type GroqResponse = {
     choices?: Array<{
@@ -18,9 +13,9 @@ type GroqResponse = {
     }>;
 };
 
-function isValidGeometry(
+function isValidShapeParameters(
     value: unknown
-): value is GeneratedGeometry {
+): value is ShapeParameters {
     if (
         typeof value !== "object" ||
         value === null
@@ -28,34 +23,7 @@ function isValidGeometry(
         return false;
     }
 
-    const geometry =
-        value as GeneratedGeometry;
-
-    if (
-        typeof geometry.name !== "string" ||
-        geometry.name.length < 1 ||
-        geometry.name.length > 50
-    ) {
-        return false;
-    }
-
-    if (
-        !Array.isArray(geometry.points) ||
-        geometry.points.length < 3 ||
-        geometry.points.length > 24
-    ) {
-        return false;
-    }
-
-    return geometry.points.every(
-        (point) =>
-            typeof point.x === "number" &&
-            typeof point.y === "number" &&
-            point.x >= 0 &&
-            point.x <= 100 &&
-            point.y >= 0 &&
-            point.y <= 100
-    );
+    return isShapeParameters(value) && value.shapeType !== 0;
 }
 
 export default async function handler(
@@ -131,25 +99,23 @@ export default async function handler(
                         {
                             role: "system",
                             content: `
-You generate simple recognizable 2D silhouettes
+You generate a procedural shape configuration
 for a small animated character named JEV.
 
-The output will be rendered as one SVG polygon.
+The shape will be rendered natively by a Rive
+Path Effect Script. Do not generate SVG or points.
 
 RULES:
 
-- Work inside a 100x100 coordinate system.
-- x and y must always be between 0 and 100.
-- Create a recognizable silhouette based on the user's request.
-- Prefer approximately 8 to 18 points.
-- The polygon should occupy most of the canvas.
-- Keep the silhouette centered.
-- Prefer simple iconic shapes instead of detailed drawings.
-- Avoid tiny details.
-- Do not generate text.
-- Do not generate SVG.
-- Do not generate code.
-- Only describe the geometry through points.
+- Choose shapeType 1 for rounded square, 2 for diamond,
+  3 for triangle, or 4 for organic blob.
+- Use shapeWidth and shapeHeight from 50 to 150.
+- Use shapeSharpness and shapeRoundness from 0 to 100.
+- Use shapeBulge, shapeTaper, and shapeAsymmetry
+  from -100 to 100.
+- Prefer neutral values unless the user's request needs
+  a specific deformation.
+- Return only the requested shape parameters.
               `,
                         },
 
@@ -171,36 +137,57 @@ RULES:
                                 type: "object",
 
                                 properties: {
-                                    name: {
-                                        type: "string",
+                                    shapeType: {
+                                        type: "integer",
+                                        minimum: 1,
+                                        maximum: 4,
                                     },
-
-                                    points: {
-                                        type: "array",
-
-                                        items: {
-                                            type: "object",
-
-                                            properties: {
-                                                x: {
-                                                    type: "number",
-                                                },
-
-                                                y: {
-                                                    type: "number",
-                                                },
-                                            },
-
-                                            required: ["x", "y"],
-
-                                            additionalProperties: false,
-                                        },
+                                    shapeWidth: {
+                                        type: "number",
+                                        minimum: 50,
+                                        maximum: 150,
+                                    },
+                                    shapeHeight: {
+                                        type: "number",
+                                        minimum: 50,
+                                        maximum: 150,
+                                    },
+                                    shapeSharpness: {
+                                        type: "number",
+                                        minimum: 0,
+                                        maximum: 100,
+                                    },
+                                    shapeRoundness: {
+                                        type: "number",
+                                        minimum: 0,
+                                        maximum: 100,
+                                    },
+                                    shapeBulge: {
+                                        type: "number",
+                                        minimum: -100,
+                                        maximum: 100,
+                                    },
+                                    shapeTaper: {
+                                        type: "number",
+                                        minimum: -100,
+                                        maximum: 100,
+                                    },
+                                    shapeAsymmetry: {
+                                        type: "number",
+                                        minimum: -100,
+                                        maximum: 100,
                                     },
                                 },
 
                                 required: [
-                                    "name",
-                                    "points",
+                                    "shapeType",
+                                    "shapeWidth",
+                                    "shapeHeight",
+                                    "shapeSharpness",
+                                    "shapeRoundness",
+                                    "shapeBulge",
+                                    "shapeTaper",
+                                    "shapeAsymmetry",
                                 ],
 
                                 additionalProperties: false,
@@ -241,37 +228,22 @@ RULES:
             });
         }
 
-        const geometry =
+        const parameters =
             JSON.parse(content);
 
-        if (!isValidGeometry(geometry)) {
+        if (!isValidShapeParameters(parameters)) {
             console.error(
-                "Invalid geometry:",
-                geometry
+                "Invalid shape parameters:",
+                parameters
             );
 
             return response.status(422).json({
-                error: "Invalid generated geometry",
+                error: "Invalid generated parameters",
             });
         }
 
-        const shape = {
-            id: crypto.randomUUID(),
-
-            name: geometry.name,
-
-            type: "polygon" as const,
-
-            points: geometry.points,
-
-            fill: "white",
-
-            width: 180,
-            height: 180,
-        };
-
         return response.status(200).json({
-            shape,
+            parameters: parameters as ShapeParameters,
         });
     } catch (error) {
         console.error(

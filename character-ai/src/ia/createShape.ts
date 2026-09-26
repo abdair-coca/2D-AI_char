@@ -1,14 +1,15 @@
-import type {
-  ShapeSpec,
+import {
+  isShapeParameters,
+  type ShapeParameters,
 } from "../types/shape";
 
 type CreateShapeResponse = {
-  shape: ShapeSpec;
+  parameters: unknown;
 };
 
 export async function createShape(
   prompt: string
-): Promise<ShapeSpec> {
+): Promise<ShapeParameters> {
   const response = await fetch(
     "/api/create-shape",
     {
@@ -33,5 +34,9 @@ export async function createShape(
   const data: CreateShapeResponse =
     await response.json();
 
-  return data.shape;
+  if (!isShapeParameters(data.parameters)) {
+    throw new Error("Shape model returned invalid parameters");
+  }
+
+  return data.parameters;
 }
