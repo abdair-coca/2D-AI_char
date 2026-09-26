@@ -21,7 +21,7 @@ import {
   Layout,
   Fit,
   Alignment,
-} from "@rive-app/react-canvas";
+} from "@rive-app/react-webgl2";
 
 import {
   useCharacterController,
@@ -48,7 +48,6 @@ const Character =
         stateMachines: STATE_MACHINE,
         autoplay: true,
         autoBind: false,
-        useOffscreenRenderer: false,
         shouldDisableRiveListeners: false,
 
         layout: new Layout({

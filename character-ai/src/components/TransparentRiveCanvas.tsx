@@ -4,8 +4,8 @@ type Props = {
   sourceCanvas: HTMLCanvasElement | null;
 };
 
-const BACKGROUND_THRESHOLD = 34;
-const COLOR_TOLERANCE = 18;
+const BACKGROUND_THRESHOLD = 64;
+const COLOR_TOLERANCE = 64;
 
 function isConnectedBackgroundPixel(
   data: Uint8ClampedArray,
@@ -21,9 +21,7 @@ function isConnectedBackgroundPixel(
   );
 }
 
-function removeEdgeConnectedBackground(
-  imageData: ImageData
-) {
+function removeEdgeConnectedBackground(imageData: ImageData) {
   const { data, width, height } = imageData;
   const visited = new Uint8Array(width * height);
   const queue = new Int32Array(width * height);
@@ -75,8 +73,7 @@ function removeEdgeConnectedBackground(
 export default function TransparentRiveCanvas({
   sourceCanvas,
 }: Props) {
-  const outputCanvasRef =
-    useRef<HTMLCanvasElement>(null);
+  const outputCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const outputCanvas = outputCanvasRef.current;
@@ -93,19 +90,63 @@ export default function TransparentRiveCanvas({
 
     const renderFrame = () => {
       const { width, height } = sourceCanvas;
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const targetWidth = Math.round(
+        outputCanvas.clientWidth * devicePixelRatio
+      );
+      const targetHeight = Math.round(
+        outputCanvas.clientHeight * devicePixelRatio
+      );
 
-      if (width > 0 && height > 0) {
-        if (outputCanvas.width !== width) outputCanvas.width = width;
-        if (outputCanvas.height !== height) outputCanvas.height = height;
+      if (
+        width > 0 &&
+        height > 0 &&
+        targetWidth > 0 &&
+        targetHeight > 0
+      ) {
+        if (outputCanvas.width !== targetWidth) {
+          outputCanvas.width = targetWidth;
+        }
+        if (outputCanvas.height !== targetHeight) {
+          outputCanvas.height = targetHeight;
+        }
 
-        outputContext.clearRect(0, 0, width, height);
-        outputContext.drawImage(sourceCanvas, 0, 0);
+        const sourceRatio = width / height;
+        const targetRatio = targetWidth / targetHeight;
+        const drawWidth =
+          sourceRatio > targetRatio
+            ? targetWidth
+            : targetHeight * sourceRatio;
+        const drawHeight =
+          sourceRatio > targetRatio
+            ? targetWidth / sourceRatio
+            : targetHeight;
+        const drawX = (targetWidth - drawWidth) / 2;
+        const drawY = (targetHeight - drawHeight) / 2;
+
+        outputContext.clearRect(
+          0,
+          0,
+          targetWidth,
+          targetHeight
+        );
+        outputContext.drawImage(
+          sourceCanvas,
+          0,
+          0,
+          width,
+          height,
+          drawX,
+          drawY,
+          drawWidth,
+          drawHeight
+        );
 
         const imageData = outputContext.getImageData(
           0,
           0,
-          width,
-          height
+          targetWidth,
+          targetHeight
         );
 
         removeEdgeConnectedBackground(imageData);
