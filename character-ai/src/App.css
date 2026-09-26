@@ -231,9 +231,14 @@
   z-index: 0;
   height: 70px;
   border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(116, 86, 255, 0.42), transparent 68%);
+  background: radial-gradient(
+    ellipse,
+    rgba(5, 3, 18, 0.78) 0%,
+    rgba(100, 61, 224, 0.52) 34%,
+    transparent 72%
+  );
   content: "";
-  filter: blur(10px);
+  filter: blur(13px);
   pointer-events: none;
 }
 
@@ -264,6 +269,8 @@
   grid-row: 1;
   width: 100% !important;
   height: 100% !important;
+  filter: drop-shadow(0 20px 15px rgba(3, 1, 12, 0.78))
+    drop-shadow(0 0 26px rgba(137, 74, 255, 0.34));
   pointer-events: none;
 }
 
