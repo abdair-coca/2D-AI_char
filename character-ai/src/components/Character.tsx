@@ -27,7 +27,6 @@ import {
   useCharacterController,
   type CharacterController,
 } from "../character/useCharacterController";
-import TransparentRiveCanvas from "./TransparentRiveCanvas";
 
 type Props = object;
 
@@ -43,7 +42,7 @@ const Character =
       _props,
       ref
     ) {
-      const { rive, canvas, RiveComponent } = useRive({
+      const { rive, RiveComponent } = useRive({
         src: "/rive/prove1.riv",
         stateMachines: STATE_MACHINE,
         autoplay: true,
@@ -250,7 +249,6 @@ const Character =
           aria-label="JEV, personaje animado interactivo"
         >
           <RiveComponent className="rive-source" />
-          <TransparentRiveCanvas sourceCanvas={canvas} />
 
           <div
             className="character-controls-preview"

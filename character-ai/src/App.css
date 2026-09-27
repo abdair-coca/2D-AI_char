@@ -246,6 +246,8 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
+  transform: scale(1.4);
+  transform-origin: center;
 }
 
 .character-orbit > div:not(.character-controls-preview) {
@@ -257,10 +259,9 @@
 }
 
 .rive-source {
-  position: absolute !important;
-  inset: 0;
   z-index: 2 !important;
-  opacity: 0;
+  -webkit-mask-image: radial-gradient(ellipse 46% 43% at 50% 50%, #000 0 58%, transparent 100%);
+  mask-image: radial-gradient(ellipse 46% 43% at 50% 50%, #000 0 58%, transparent 100%);
 }
 
 .rive-processed-canvas {
